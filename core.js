@@ -7,8 +7,8 @@ export const CATALOG=[
  ['tp','GOP_TAUX DE PROTHROMBINE (TP)',3750],['tca','GOP_TEMPS DE CÉPHALINE ACTIVÉ (TCA)',3750],
  ['calcium','GOP_CALCIUM DU LCR',3000],['pct','GOP_PROCALCITONINE (PCT)',15000]
 ].map(([id,label,price])=>({id,label,price}));
-export const REGISTRARS=['ALLEGBE ARDON RUBEN BORIS JOSE','BOH KANGRO','AGRE OHIE JEAN FERLUS','KOUAME AFFOUE SABINE','KPAZAI ROCK FELLER'];
-export const CASHIERS=['AGBO FLORENCE','AKA OI AKA LAURENT','KOFFI FRANCOISE AMLAN'];
+export const REGISTRARS=['KOUAME AFFOUE SABINE','ALLEGBE ARDON RUBEN BORIS JOSE','BOH KANGRO','KPAZAI ROCK FELLER','AGRE OHIE JEAN FERLUS'];
+export const CASHIERS=['AKA OI AKA LAURENT','KOFFI FRANCOISE AMLAN','KOUADIO YAH REBECCA TEMA ANZIAN'];
 export const amount=n=>new Intl.NumberFormat('fr-FR').format(n).replace(/[\u00a0\u202f]/g,' ');
 function dateParts(date){return Object.fromEntries(new Intl.DateTimeFormat('fr-FR',{timeZone:'Africa/Abidjan',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(date).map(p=>[p.type,p.value]));}
 export function stamp(date){const p=dateParts(date);return `${p.day}/${p.month}/${p.year} , ${p.hour}:${p.minute}:${p.second}`;}
@@ -20,7 +20,8 @@ export function receiptData(input,now=new Date()){
  d.age=Number(d.age);d.months=Number(d.months||0);d.days=Number(d.days||0);
  if(!Number.isInteger(d.age)||d.age<0||d.age>120||!Number.isInteger(d.months)||d.months<0||d.months>11||!Number.isInteger(d.days)||d.days<0||d.days>30)throw Error('Vérifiez l’âge du patient.');
  if(!['F','M'].includes(d.sex))throw Error('Choisissez le sexe.');
- if(!Array.isArray(d.items)||!d.items.length||d.items.length>40)throw Error('Choisissez de 1 à 40 prestations.');
+ if(!Array.isArray(d.items)||!d.items.length||d.items.length>CATALOG.length)throw Error(`Choisissez de 1 à ${CATALOG.length} prestations.`);
+ if(new Set(d.items).size!==d.items.length)throw Error('Une prestation ne peut figurer qu’une seule fois sur le reçu.');
  d.items=d.items.map(id=>{const item=CATALOG.find(x=>x.id===id);if(!item)throw Error('Sélectionnez une prestation pour chaque ligne.');return item;});
  d.total=d.items.reduce((sum,p)=>sum+p.price,0);d.receipt=completeNumber(d.receipt,now);d.order='LAB'+completeNumber(d.order,now);
  d.paid=stamp(now);d.issued=stamp(new Date(now.getTime()+53000));return d;
