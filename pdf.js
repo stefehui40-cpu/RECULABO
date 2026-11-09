@@ -1,4 +1,4 @@
-import {amount} from './core.js?v=7';
+import {amount} from './core.js?v=8';
 export async function generatePdf(d){
  const {PDFDocument,StandardFonts,rgb}=globalThis.PDFLib;
  const doc=await PDFDocument.create();doc.registerFontkit(globalThis.fontkit);
@@ -19,12 +19,15 @@ export async function generatePdf(d){
  const left=[['Nom & Prenom : ',d.name],['ISN & Sexe: ',`${d.isn} / ${d.sex}`],['Age [Année / mois / jours ] : ',`${d.age} ans/ ${d.months} mois / ${d.days} jour (s)`]];
  const right=[['Service : ','LABORATOIRE'],['Enregistré par : ',d.registrar],['Encaissé par : ',d.cashier]];
  function fieldRows(fields,max){return fields.map(([label,value])=>{
+   const isAge=label.startsWith('Age [');
+   const available=isAge?249.75:max;
    const lines=[[]];let used=0;
    for(const [content,isLabel]of [[label,true],[value,false]])for(const token of String(content).match(/\S+\s*/g)||[]){
      const f=font;
      const tokenWidth=f.widthOfTextAtSize(token,10.5);
-     if(tokenWidth>max)throw Error('Un mot est trop long dans les informations du patient ou des agents.');
-     if(used+tokenWidth>max&&used){lines.push([]);used=0;}
+     if(tokenWidth>available)throw Error('Un mot est trop long dans les informations du patient ou des agents.');
+     const visibleWidth=f.widthOfTextAtSize(token.trimEnd(),10.5);
+     if(used&&(used+visibleWidth>available||(isAge&&token.trim()==='(s)'))){lines.push([]);used=0;}
      lines[lines.length-1].push({text:token,font:f,x:used,isLabel});used+=tokenWidth;
    }
    return {lines};
