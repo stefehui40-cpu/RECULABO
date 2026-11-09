@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {receiptData,CATALOG} from './core.js';
+const input={name:'PATIENT TEST',isn:'0001',receipt:'0002',order:'0003',sex:'F',age:43,months:0,days:7,registrar:'AGENT TEST',cashier:'AGENT TEST',items:CATALOG.slice(0,8).map(p=>p.id)};
+test('Tarifs du modèle, somme et identifiants',()=>{const d=receiptData(input);assert.equal(d.total,26250);assert.equal(d.order,'LAB0003');assert.equal(d.receipt,'0002');assert.equal(d.items.length,8);});
+test('Émission 17 secondes après paiement au changement d’année',()=>{const d=receiptData(input,new Date('2026-12-31T23:59:50Z'));assert.match(d.paid,/31\/12\/2026.*23:59:50/);assert.match(d.issued,/01\/01\/2027.*00:00:07/);});
+test('Une prestation, catalogue complet et erreurs de saisie',()=>{assert.equal(receiptData({...input,items:['pct']}).total,15000);assert.equal(CATALOG.length,13);for(const fields of [{items:[]},{items:['inconnu']},{order:'LAB4'},{age:-1},{months:12},{days:31},{receipt:'123x'}])assert.throws(()=>receiptData({...input,...fields}));});
