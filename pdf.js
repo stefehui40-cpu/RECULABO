@@ -1,9 +1,10 @@
-import {amount} from './core.js?v=6';
+import {amount} from './core.js?v=7';
 export async function generatePdf(d){
  const {PDFDocument,StandardFonts,rgb}=globalThis.PDFLib;
  const doc=await PDFDocument.create();doc.registerFontkit(globalThis.fontkit);
- const bytes=await Promise.all(['ReceiptSans.ttf','identity.png'].map(async n=>{const r=await fetch(new URL(n,import.meta.url));if(!r.ok)throw Error('Modèle indisponible : reconnectez-vous et rechargez la page.');return new Uint8Array(await r.arrayBuffer());}));
+ const bytes=await Promise.all(['ReceiptSans.ttf','identity.png','table-header.pdf'].map(async n=>{const r=await fetch(new URL(n,import.meta.url));if(!r.ok)throw Error('Modèle indisponible : reconnectez-vous et rechargez la page.');return new Uint8Array(await r.arrayBuffer());}));
  const font=await doc.embedFont(bytes[0],{subset:true}),bold=await doc.embedFont(StandardFonts.HelveticaBold),logo=await doc.embedPng(bytes[1]);
+ const [tableHeader]=await doc.embedPdf(bytes[2]);
  const black=rgb(0,0,0),gray=rgb(.30,.35,.42),line=rgb(.85,.85,.85),green=rgb(.08,.64,.31);
  const width=595,height=841;let page;
  function text(s,x,y,size=10.5,f=font,color=black){page.drawText(String(s),{x,y:height-y,size,font:f,color});}
@@ -17,29 +18,30 @@ export async function generatePdf(d){
  }
  const left=[['Nom & Prenom : ',d.name],['ISN & Sexe: ',`${d.isn} / ${d.sex}`],['Age [Année / mois / jours ] : ',`${d.age} ans/ ${d.months} mois / ${d.days} jour (s)`]];
  const right=[['Service : ','LABORATOIRE'],['Enregistré par : ',d.registrar],['Encaissé par : ',d.cashier]];
- function fieldRows(fields){return fields.map(([label,value])=>{
+ function fieldRows(fields,max){return fields.map(([label,value])=>{
    const lines=[[]];let used=0;
    for(const [content,isLabel]of [[label,true],[value,false]])for(const token of String(content).match(/\S+\s*/g)||[]){
      const f=font;
      const tokenWidth=f.widthOfTextAtSize(token,10.5);
-     if(tokenWidth>250)throw Error('Un mot est trop long dans les informations du patient ou des agents.');
-     if(used+tokenWidth>250&&used){lines.push([]);used=0;}
+     if(tokenWidth>max)throw Error('Un mot est trop long dans les informations du patient ou des agents.');
+     if(used+tokenWidth>max&&used){lines.push([]);used=0;}
      lines[lines.length-1].push({text:token,font:f,x:used,isLabel});used+=tokenWidth;
    }
    return {lines};
  });}
- const a=fieldRows(left),b=fieldRows(right),infoHeight=Math.max(76,...[a,b].map(fields=>fields.reduce((h,f)=>h+f.lines.length*15+3,12)));
- function info(){box(28.5,241,261,infoHeight);box(296,241,270,infoHeight);for(const [fields,x]of [[a,37.5],[b,305]]){let y=255;for(const f of fields){for(const line of f.lines){for(const run of line){
+ // Measurements in points from the reference PDF; additional lines may expand both boxes equally.
+ const infoTop=240.58002;
+ const a=fieldRows(left,241.5),b=fieldRows(right,252.75),infoHeight=Math.max(76.5,...[a,b].map(fields=>fields.reduce((h,f)=>h+f.lines.length*15+3,7.5)));
+ function info(){box(28.5,infoTop,261,infoHeight);box(295.5,infoTop,272.25,infoHeight);for(const [fields,x]of [[a,38.25],[b,305.25]]){let y=254.83002;for(const f of fields){for(const line of f.lines){for(const run of line){
    if(run.isLabel)page.pushOperators(PDFLib.pushGraphicsState(),PDFLib.setLineWidth(.28),PDFLib.setStrokingRgbColor(0,0,0),PDFLib.setTextRenderingMode(PDFLib.TextRenderingMode.FillAndOutline));
    text(run.text,x+run.x,y,10.5,run.font);
    if(run.isLabel)page.pushOperators(PDFLib.popGraphicsState());
  }y+=15;}y+=3;}}}
- const cols=[28.5,129.5,296,368,404,478.5,566.5];
- const headers=["N° D'ORDRE",'PRESTATION','PU INITIAL','QT','RÉDUCTION','TOTAL À PAYER'];
- function table(rows,top){let y=top+36;const hs=rows.map(item=>Math.max(36,wrap(item.label,145,10).length*15+6));const bottom=y+hs.reduce((s,h)=>s+h,0);box(cols[0],top,538,bottom-top,7);for(let i=1;i<cols.length-1;i++)rule(cols[i],top,cols[i],bottom);headers.forEach((s,i)=>text(s,cols[i]+(i===3?10:11),top+21,8.5,bold));rule(cols[0],y,cols[6],y);
- rows.forEach((item,j)=>{const h=hs[j],lines=wrap(item.label,145,10);let orderSize=Math.min(10,80/font.widthOfTextAtSize(d.order,1));if(orderSize<6.4)throw Error('Le numéro d’ordre est trop long.');text(d.order,40,y+h/2+3.5,orderSize);lines.forEach((s,k)=>text(s,140.5,y+(h-lines.length*15)/2+11+k*15,10));text(amount(item.price)+' XOF',307,y+h/2+3.5,10);text('1',379,y+h/2+3.5,10);text('Aucune',416,y+h/2+3.5,10);text(amount(item.price)+' XOF',489.5,y+h/2+3.5,10);y+=h;if(j<rows.length-1)rule(cols[0],y,cols[6],y);});}
+ const cols=[28.5,131.25,289.5,360.75,397.5,474.75,567.75];
+ function table(rows,top){let y=top+36;const hs=rows.map(item=>Math.max(36,wrap(item.label,135,10).length*15+6));const bottom=y+hs.reduce((s,h)=>s+h,0);box(cols[0],top,539.25,bottom-top,7.5);for(let i=1;i<cols.length-1;i++)rule(cols[i],top,cols[i],bottom);page.drawPage(tableHeader,{x:28.5,y:height-top-36,width:539.25,height:36});rule(cols[0],y,cols[6],y);
+ rows.forEach((item,j)=>{const h=hs[j],lines=wrap(item.label,135,10);let orderSize=Math.min(10,80/font.widthOfTextAtSize(d.order,1));if(orderSize<6.4)throw Error('Le numéro d’ordre est trop long.');text(d.order,40,y+h/2+3.5,orderSize);lines.forEach((s,k)=>text(s,143.25,y+(h-lines.length*15)/2+11+k*15,10));text(amount(item.price)+' XOF',301.5,y+h/2+3.5,10);text('1',372,y+h/2+3.5,10);text('Aucune',409.5,y+h/2+3.5,10);text(amount(item.price)+' XOF',487.5,y+h/2+3.5,10);y+=h;if(j<rows.length-1)rule(cols[0],y,cols[6],y);});}
  let remaining=[...d.items],pages=0;
- while(remaining.length){heading();info();const top=241+infoHeight+12;let used=36,count=0;for(const item of remaining){const h=Math.max(36,wrap(item.label,145,10).length*15+6);if(top+used+h>800)break;used+=h;count++;}if(!count)throw Error('Les informations sont trop longues pour le modèle.');table(remaining.splice(0,count),top);pages++;}
+ while(remaining.length){heading();info();const top=infoTop+infoHeight+12;let used=36,count=0;for(const item of remaining){const h=Math.max(36,wrap(item.label,135,10).length*15+6);if(top+used+h>800)break;used+=h;count++;}if(!count)throw Error('Les informations sont trop longues pour le modèle.');table(remaining.splice(0,count),top);pages++;}
  if(pages>1)doc.getPages().forEach((p,i)=>{page=p;text(`${i+1}/${pages}`,548,824,8,font,gray);});
  doc.setTitle('Reçu '+d.receipt);doc.setCreator('RECULABO');return doc.save();
 }

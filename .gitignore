@@ -2,3 +2,4 @@ tmp/
 test-results/
 node_modules/
 *.PDF
+!table-header.pdf
