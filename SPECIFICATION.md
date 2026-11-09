@@ -10,7 +10,7 @@ Nom et prénom, ISN, sexe, âge, enregistré par, encaissé par, numéro du reç
 Service : LABORATOIRE. Logo et coordonnées fixes du modèle.
 
 ## Dates et calculs
-Heure d’Abidjan. Paiement à l’heure de génération ; émission exactement 17 secondes après le paiement, avec gestion du changement de minute et de date.
+Heure d’Abidjan. Paiement à l’heure de génération ; émission exactement 53 secondes après le paiement, avec gestion du changement de minute et de date.
 Quantité 1 et réduction Aucune pour chaque prestation.
 Total de ligne égal au prix de la prestation. Montant total et montant reçu égaux à la somme des lignes. Monnaie 0 FCFA.
 Numéro d’ordre : préfixe LAB suivi de chiffres, identique sur toutes les lignes.
