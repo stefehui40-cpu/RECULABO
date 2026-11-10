@@ -5,10 +5,15 @@ export const CATALOG=[
  ['creatinine','CREATIMINE/GOP',1500],['glycemie','GLYCÉMIE/GOP',1500],
  ['asat','GOP_ASAT (TGO) TRANSAMINASES',3750],['alat','GOP_ALAT (TGP) TRANSAMINASES',3750],
  ['tp','GOP_TAUX DE PROTHROMBINE (TP)',3750],['tca','GOP_TEMPS DE CÉPHALINE ACTIVÉ (TCA)',3750],
- ['calcium','GOP_CALCIUM DU LCR',3000],['pct','GOP_PROCALCITONINE (PCT)',15000]
+ ['calcium','GOP_CALCIUM DU LCR',3000],['pct','GOP_PROCALCITONINE (PCT)',15000],
+ ['bilirubine-totale','GOP_BILIRUBINE TOTALE',3750],
+ ['bilirubine-conjuguee','GOP_BILIRUBINE CONJUGUÉE',3750],
+ ['protidemie','PROTIDÉMIE',3000],
+ ['ionogramme-urinaire','GOP_IONOGRAMME URINAIRE (NA+, K+, CL-)',5250],
+ ['calcemie','GOP_CALCÉMIE (CALCIUM)',3000]
 ].map(([id,label,price])=>({id,label,price}));
 export const REGISTRARS=['KOUAME AFFOUE SABINE','ALLEGBE ARDON RUBEN BORIS JOSE','BOH KANGRO','KPAZAI ROCK FELLER','AGRE OHIE JEAN FERLUS'];
-export const CASHIERS=['AKA OI AKA LAURENT','KOFFI FRANCOISE AMLAN','KOUADIO YAH REBECCA TEMA ANZIAN'];
+export const CASHIERS=['AKA OI AKA LAURENT','KOFFI FRANCOISE AMLAN','KOUADIO EPSE ANZIAN YAH TEMA REBECCA','AGBO FLORENCE'];
 export const amount=n=>new Intl.NumberFormat('fr-FR').format(n).replace(/[\u00a0\u202f]/g,' ');
 function dateParts(date){return Object.fromEntries(new Intl.DateTimeFormat('fr-FR',{timeZone:'Africa/Abidjan',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(date).map(p=>[p.type,p.value]));}
 export function stamp(date){const p=dateParts(date);return `${p.day}/${p.month}/${p.year} , ${p.hour}:${p.minute}:${p.second}`;}

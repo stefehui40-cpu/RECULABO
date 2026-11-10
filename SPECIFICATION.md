@@ -18,7 +18,7 @@ QR code : numéro du reçu uniquement, en préservant les zéros initiaux.
 
 ## Prestations
 Choix dans une liste déroulante. Bouton pour ajouter une prestation, possibilité de supprimer une ligne.
-Catalogue de 13 prestations importé depuis LISTE LABO.docx.
+Catalogue de 18 prestations importé depuis LISTE LABO.docx.
 
 ## Usage
 Générer, ouvrir, télécharger et partager le PDF sur mobile. Reprendre le fonctionnement hors connexion et l’effacement des informations après génération du projet précédent.
