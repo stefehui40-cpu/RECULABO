@@ -1,4 +1,4 @@
-import {amount} from './core.js?v=12';
+import {amount} from './core.js?v=13';
 export async function generatePdf(d){
  const {PDFDocument,StandardFonts,rgb}=globalThis.PDFLib;
  const doc=await PDFDocument.create();doc.registerFontkit(globalThis.fontkit);
@@ -21,7 +21,7 @@ export async function generatePdf(d){
  const left=[['Nom & Prenom : ',d.name],['ISN & Sexe: ',`${d.isn} / ${d.sex}`],['Age [Année / mois / jours ] : ',`${d.age} ans/ ${d.months} mois / ${d.days} jour (s)`]];
  const right=[['Service : ','LABORATOIRE'],['Enregistré par : ',d.registrar],['Encaissé par : ',d.cashier]];
  function fieldRows(fields,max){return fields.map(([label,value])=>{
-   const available=max;
+   const available=label.startsWith('Age [')?max+8.25:max;
    const lines=[[]];let used=0;
    for(const [content,isLabel]of [[label,true],[value,false]])for(const token of String(content).match(/\S+\s*/g)||[]){
      const f=font;
@@ -33,10 +33,13 @@ export async function generatePdf(d){
    }
    return {lines};
  });}
- // Measurements in points from the reference PDF; additional lines may expand both boxes equally.
+ // Balance the two frames using the agents' text width, within the reference proportions.
  const infoTop=240.58002;
- const a=fieldRows(left,283.5),b=fieldRows(right,210.75),infoHeight=Math.max(61.5,...[a,b].map(fields=>fields.reduce((h,f)=>h+f.lines.length*15+3,7.5)));
- function info(){box(28.5,infoTop,303,infoHeight);box(337.5,infoTop,230.25,infoHeight);for(const [fields,x]of [[a,38.25],[b,347.25]]){let y=254.83002;for(const f of fields){for(const line of f.lines){for(const run of line){
+ const agentTextWidth=Math.max(...right.map(([label,value])=>font.widthOfTextAtSize(label+value,10.5)));
+ const agentWidth=agentTextWidth<=195.75?230.25:Math.min(272.25,Math.max(240.75,agentTextWidth+29.5));
+ const patientWidth=533.25-agentWidth,agentX=28.5+patientWidth+6;
+ const a=fieldRows(left,patientWidth-19.5),b=fieldRows(right,agentWidth-19.5),infoHeight=Math.max(61.5,...[a,b].map(fields=>fields.reduce((h,f)=>h+f.lines.length*15+3,7.5)));
+ function info(){box(28.5,infoTop,patientWidth,infoHeight);box(agentX,infoTop,agentWidth,infoHeight);for(const [fields,x]of [[a,38.25],[b,agentX+9.75]]){let y=254.83002;for(const f of fields){for(const line of f.lines){for(const run of line){
    if(run.isLabel)page.pushOperators(PDFLib.pushGraphicsState(),PDFLib.setLineWidth(.28),PDFLib.setStrokingRgbColor(0,0,0),PDFLib.setTextRenderingMode(PDFLib.TextRenderingMode.FillAndOutline));
    text(run.text,x+run.x,y,10.5,run.font);
    if(run.isLabel)page.pushOperators(PDFLib.popGraphicsState());
