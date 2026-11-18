@@ -1,6 +1,8 @@
 # RECULABO
 
-Générateur statique de reçus de laboratoire, adapté au mobile. Les 18 prestations et leurs prix proviennent de la liste fournie. Quantité 1, aucune réduction, totaux automatiques. L’émission suit le paiement de 53 secondes, à l’heure d’Abidjan. Le QR contient exclusivement le numéro du reçu. Le numéro LAB saisi est répété sur chaque prestation.
+Saisie rapide : nom et prénom, ISN, âge avec unités (ans, mois, jours), abréviations des analyses, numéro du reçu, numéro LAB, sexe F/M. Le bouton « Remplir automatiquement » remplit les champs pour vérification sans générer immédiatement le PDF. Les séparateurs et accents sont neutralisés ; les chiffres d’un identifiant doivent rester ensemble. Les abréviations du Word sont affichées dans l’aide. Les termes inconnus ou les numéros ambigus bloquent le remplissage. Les agents déjà saisis sont conservés.
+
+Générateur statique de reçus de laboratoire, adapté au mobile. Les 19 prestations et leurs prix proviennent de la liste fournie. Quantité 1, aucune réduction, totaux automatiques. L’émission suit le paiement de 53 secondes, à l’heure d’Abidjan. Le QR contient exclusivement le numéro du reçu. Le numéro LAB saisi est répété sur chaque prestation.
 
 Les données patient restent en mémoire sur l’appareil et le formulaire est vidé après génération. Le PDF peut être téléchargé ou partagé. Une première visite avec Internet installe les fichiers nécessaires au fonctionnement hors connexion.
 

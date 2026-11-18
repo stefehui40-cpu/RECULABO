@@ -1,4 +1,4 @@
-import {amount} from './core.js?v=14';
+import {amount} from './core.js?v=15';
 export async function generatePdf(d){
  const {PDFDocument,StandardFonts,rgb}=globalThis.PDFLib;
  const doc=await PDFDocument.create();doc.registerFontkit(globalThis.fontkit);

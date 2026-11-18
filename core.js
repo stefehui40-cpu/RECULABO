@@ -10,7 +10,8 @@ export const CATALOG=[
  ['bilirubine-conjuguee','GOP_BILIRUBINE CONJUGUÉE',3750],
  ['protidemie','PROTIDÉMIE',3000],
  ['ionogramme-urinaire','GOP_IONOGRAMME URINAIRE (NA+, K+, CL-)',5250],
- ['calcemie','GOP_CALCÉMIE (CALCIUM)',3000]
+ ['calcemie','GOP_CALCÉMIE (CALCIUM)',3000],
+ ['electrophorese','GOP_ELECTROPHORÈSE HÉMOGLOBINE',12000]
 ].map(([id,label,price])=>({id,label,price}));
 export const REGISTRARS=['KOUAME AFFOUE SABINE','ALLEGBE ARDON RUBEN BORIS JOSE','BOH KANGRO','KPAZAI ROCK FELLER','AGRE OHIE JEAN FERLUS'];
 export const CASHIERS=['AKA OI AKA LAURENT','KOFFI FRANCOISE AMLAN','KOUADIO EPSE ANZIAN YAH TEMA REBECCA','AGBO FLORENCE'];
